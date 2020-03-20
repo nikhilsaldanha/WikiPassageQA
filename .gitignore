@@ -127,3 +127,18 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# ignore data folder and all files and folders within
+/data/**
+
+# exclude folders within data/
+!/data/**/
+
+# keep the .gitkeep to preserve folder structure
+!/data/**/.gitkeep
+
+# vscode
+.vscode
+
+# macOS
+.DS_Store

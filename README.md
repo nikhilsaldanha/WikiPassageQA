@@ -21,6 +21,16 @@ Setup the dev environment by running:
 5. Once you're done, commit and push.
 6. Go to the branch page and create a merge request. Ask a team member to approve changes.
 
+## Data Extraction Pipeline
+
+Currently, splits each row with multiple comma separated passage ids in `RelevantPassages` column into multiple rows, each with 1 passage id.
+
+**How to Run:** Execute `src/data_extraction/data_extraction.py` to extract data for train, test and dev datasets and store in `data/raw/extracted_query_data`. Use this data in further steps
+
+## Feature Extraction Pipeline (TBD)
+
+## Model Creation Pipeline (TBD)
+
 ## Project Structure
 
 ```shell

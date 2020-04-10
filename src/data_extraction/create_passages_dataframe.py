@@ -15,7 +15,7 @@ def thread_function(i, till_len):
         for pass_id in passages_dict[doc_ids[j]]:
             passage = passages_dict[doc_ids[j]][pass_id]
 
-            df2 = pd.DataFrame([[doc_ids[j], 0 , passage]], columns=column_names)
+            df2 = pd.DataFrame([[doc_ids[j], pass_id , passage]], columns=column_names)
             passages_df = passages_df.append(df2)
         count = count + 1
         print ("Thread " + str(i) +" docs completed: " + str(count))

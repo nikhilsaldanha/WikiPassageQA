@@ -1,4 +1,3 @@
-import pandas as pd
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
@@ -7,7 +6,7 @@ import string
 import json
 
 
-class PassageDataExtraction:
+class WikiQAPassageDataExtraction:
     def __init__(self, passage_data_path: str):
         self.passage_data_path = passage_data_path
 
@@ -64,7 +63,7 @@ if __name__ == "__main__":
         RAW_DATA_DIR, "WikiPassageQA/document_passages.json"
     )
 
-    de = PassageDataExtraction(passage_data_path)
+    de = WikiQAPassageDataExtraction(passage_data_path)
 
     pass_file = os.path.basename(passage_data_path)
     passage_extract_path = os.path.join(EXTRACT_DATA_DIR, pass_file)

@@ -4,7 +4,8 @@ Reproduction of "WikiPassageQA: A Benchmark Collection for Research on Non-facto
 
 ## Instructions for setting up
 
-Download data from [here](https://ciir.cs.umass.edu/downloads/wikipassageqa/WikiPassageQA) and move it to `data/raw`.
+1. Download wikipassage data from [here](https://ciir.cs.umass.edu/downloads/wikipassageqa/WikiPassageQA) and move it to `data/raw`.
+2. Download WebAP data from [here](https://ciir.cs.umass.edu/downloads/WebAP/WebAP.tar.gz) and move it to `data/raw`.
 
 Setup the dev environment by running:
 
@@ -45,8 +46,14 @@ Installing nltk corpora:
 
 **How to Run:**
 
-1. Execute: `python src/data_extraction/query_data_extraction.py` to extract query data
-2. Execute: `python src/data_extraction/passage_data_extraction.py` to extract passage data
+**I. WikiPassageQA:**
+1. Execute: `python src/data_extraction/wikiqa_query_data_extraction.py` to extract query data
+2. Execute: `python src/data_extraction/wikiqa_passage_data_extraction.py` to extract passage data
+
+**II. WebAP:**
+1. Execute: `python src/data_extraction/webap_data_extraction.py` to extract query and passage data from WebAP and store it in `data/extracted/webap_passages.json` and `data/extraced/webap_queries.csv`
+
+If pre-processing is not required, while calling `WebAPDataExtraction.extract_data()`, pass `preprocess=False`.
 
 Extracted data is stored in `data/extracted`. Query and Passage is converted to list of lemmatized/stemmed tokens.
 

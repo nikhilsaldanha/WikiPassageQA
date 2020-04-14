@@ -25,7 +25,7 @@ class WebAPDataExtraction:
         return query_data
 
     def load_passage_data(self, data_path: str):
-        with open(data_path, "r") as f:
+        with open(data_path, "r", encoding="utf8") as f:
             passage_data_xml = f.read()
 
         passage_data_dict = xmltodict.parse(passage_data_xml)
@@ -108,7 +108,7 @@ if __name__ == "__main__":
     DATA_DIR = os.path.join(CUR_DIR, "../../data")
     RAW_DATA_DIR = os.path.join(DATA_DIR, "raw")
     EXTRACT_DATA_DIR = os.path.join(DATA_DIR, "extracted")
-    passage_data_path = os.path.join(RAW_DATA_DIR, "WebAP/gradedText/grade.trectext")
+    passage_data_path = os.path.join(RAW_DATA_DIR, "WebAP/gradedText/grade.trectext_patched")
     query_data_path = os.path.join(RAW_DATA_DIR, "WebAP/gradedText/gov2.query.json")
 
     query_filename = "webap_queries.csv"

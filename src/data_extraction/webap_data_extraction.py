@@ -70,30 +70,26 @@ class WebAPDataExtraction:
                 elif len(paras) == 1 and type(paras):
                     paras = [paras]
                 for i, para in enumerate(paras):
-                    passage = " ".join(para["SENTENCE"])
-                    # pre-processing
-                    if preprocess:
-                        passage = self.preprocess(passage)
                     passage_id = f"{self.relevance_ids[relevance]}{i}"
-                    passages[doc_id][passage_id] = passage
                     query_text = self.query_data[self.query_data["number"] == query_id][
                         "text"
                     ]
-                    if relevance in self.relevant:
-                        try:
-                            queries.append(
-                                {
-                                    "DocumentID": doc_id,
-                                    "QID": query_id,
-                                    "Question": query_text.values[0],
-                                    "RelevantPassages": passage_id,
-                                }
-                            )
-                        except:
-                            # input(query_id)
-                            # input
-                            # (query_text)
-                            pass
+                    if relevance in self.relevant and len(query_text) > 0:
+                        queries.append(
+                            {
+                                "DocumentID": doc_id,
+                                "QID": query_id,
+                                "Question": query_text.values[0],
+                                "RelevantPassages": passage_id,
+                            }
+                        )
+                        passage = " ".join(para["SENTENCE"])
+                        # pre-processing
+                        if preprocess:
+                            passage = self.preprocess(passage)
+                        passages[doc_id][passage_id] = passage
+                    else:
+                        continue
             query_dfs.append(pd.DataFrame.from_records(queries))
             if di % 100 == 0:
                 print(f"{round(100*di/len(docs), 2)}% done")
@@ -117,4 +113,4 @@ if __name__ == "__main__":
     extracted_passage_path = os.path.join(EXTRACT_DATA_DIR, passage_filename)
     # json.dump(de, open(extracted_passage_path, "w"))
     de = WebAPDataExtraction(query_data_path, passage_data_path)
-    de.extract_data(extracted_query_path, extracted_passage_path, preprocess=True)
+    de.extract_data(extracted_query_path, extracted_passage_path, preprocess=False)

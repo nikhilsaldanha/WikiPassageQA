@@ -122,3 +122,19 @@ src                    : all clean python scripts
 
 documents              : contains papers/reports required
 ```
+
+## Obtaining Metrics
+Edit the `/src/TestBench.py` to add function to either:
+1. generate test results
+2. read test results from a pickle
+Then use the tester in the __main__ function to run tests for the particular model.
+
+Keep  in ming that the output mapping is:
+QID -> (DocID + PassageID)
+
+Therefore, keep your outputs in a data frame with columns as
+```
+columns = ["QID", "DocID", "PassageID"]
+test_result = pd.DataFrame(columns=columns)
+```
+then you can populate test_result

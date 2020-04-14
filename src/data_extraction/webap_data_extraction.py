@@ -70,17 +70,12 @@ class WebAPDataExtraction:
                 elif len(paras) == 1 and type(paras):
                     paras = [paras]
                 for i, para in enumerate(paras):
-                    passage = " ".join(para["SENTENCE"])
-                    # pre-processing
-                    if preprocess:
-                        passage = self.preprocess(passage)
                     passage_id = f"{self.relevance_ids[relevance]}{i}"
-                    passages[doc_id][passage_id] = passage
                     query_text = self.query_data[self.query_data["number"] == query_id][
                         "text"
                     ]
-                    if relevance in self.relevant:
-                        try:
+                    if len(query_text) > 0:
+                        if relevance in self.relevant:
                             queries.append(
                                 {
                                     "DocumentID": doc_id,
@@ -89,11 +84,13 @@ class WebAPDataExtraction:
                                     "RelevantPassages": passage_id,
                                 }
                             )
-                        except:
-                            # input(query_id)
-                            # input
-                            # (query_text)
-                            pass
+                        passage = " ".join(para["SENTENCE"])
+                        # pre-processing
+                        if preprocess:
+                            passage = self.preprocess(passage)
+                        passages[doc_id][passage_id] = passage
+                    else:
+                        continue
             query_dfs.append(pd.DataFrame.from_records(queries))
             if di % 100 == 0:
                 print(f"{round(100*di/len(docs), 2)}% done")

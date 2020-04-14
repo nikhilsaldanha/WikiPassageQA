@@ -7,7 +7,7 @@ from nltk.stem import PorterStemmer
 import string
 
 
-class QueryDataExtraction:
+class WikiQAQueryDataExtraction:
     def __init__(self, query_data_path: str):
         self.query_data_path = query_data_path
 
@@ -124,7 +124,7 @@ if __name__ == "__main__":
     ]
 
     for query_data_path in query_data_paths:
-        de = QueryDataExtraction(query_data_path)
+        de = WikiQAQueryDataExtraction(query_data_path)
 
         query_file = os.path.basename(query_data_path).split(".")[0]
         query_extract_path = os.path.join(EXTRACT_DATA_DIR, f"{query_file}.csv")

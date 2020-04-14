@@ -25,7 +25,7 @@ class WebAPDataExtraction:
         return query_data
 
     def load_passage_data(self, data_path: str):
-        with open(data_path, "r") as f:
+        with open(data_path, "r", encoding="utf8") as f:
             passage_data_xml = f.read()
 
         passage_data_dict = xmltodict.parse(passage_data_xml)
@@ -74,15 +74,16 @@ class WebAPDataExtraction:
                     query_text = self.query_data[self.query_data["number"] == query_id][
                         "text"
                     ]
-                    if relevance in self.relevant and len(query_text) > 0:
-                        queries.append(
-                            {
-                                "DocumentID": doc_id,
-                                "QID": query_id,
-                                "Question": query_text.values[0],
-                                "RelevantPassages": passage_id,
-                            }
-                        )
+                    if len(query_text) > 0:
+                        if relevance in self.relevant:
+                            queries.append(
+                                {
+                                    "DocumentID": doc_id,
+                                    "QID": query_id,
+                                    "Question": query_text.values[0],
+                                    "RelevantPassages": passage_id,
+                                }
+                            )
                         passage = " ".join(para["SENTENCE"])
                         # pre-processing
                         if preprocess:
@@ -104,7 +105,7 @@ if __name__ == "__main__":
     DATA_DIR = os.path.join(CUR_DIR, "../../data")
     RAW_DATA_DIR = os.path.join(DATA_DIR, "raw")
     EXTRACT_DATA_DIR = os.path.join(DATA_DIR, "extracted")
-    passage_data_path = os.path.join(RAW_DATA_DIR, "WebAP/gradedText/grade.trectext")
+    passage_data_path = os.path.join(RAW_DATA_DIR, "WebAP/gradedText/grade.trectext_patched")
     query_data_path = os.path.join(RAW_DATA_DIR, "WebAP/gradedText/gov2.query.json")
 
     query_filename = "webap_queries.csv"
@@ -113,4 +114,4 @@ if __name__ == "__main__":
     extracted_passage_path = os.path.join(EXTRACT_DATA_DIR, passage_filename)
     # json.dump(de, open(extracted_passage_path, "w"))
     de = WebAPDataExtraction(query_data_path, passage_data_path)
-    de.extract_data(extracted_query_path, extracted_passage_path, preprocess=False)
+    de.extract_data(extracted_query_path, extracted_passage_path, preprocess=True)

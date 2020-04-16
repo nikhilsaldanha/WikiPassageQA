@@ -41,11 +41,12 @@ def vsm(max_results):
 
 if __name__ == "__main__":
     CUR_DIR = os.path.dirname(__file__)
-    testpath = os.path.join(CUR_DIR, '../data/raw/WikiPassageQA/dev.tsv')
+
+    testpath = os.path.join(CUR_DIR, '../data/raw/WikiPassageQA/test.tsv')
 
     tester = TestMetrics(testpath)
 
-    max_results = 1000
+    max_results = 20
     vsm_results = vsm(max_results)
     tester.get_metrics(vsm_results, max_results)
     

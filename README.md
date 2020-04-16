@@ -12,6 +12,11 @@ Setup the dev environment by running:
 2. `source env/bin/activate`
 3. `pip install -r requirements.txt`
 
+Installing nltk corpora:
+
+1. `python -c"import nltk; nltk.download('stopwords')"`
+2. `python -c"import nltk; nltk.download('wordnet')"`
+
 ## Contribution Guidelines
 
 1. Clone the repository: `git clone git@github.com:nikhilsaldanha/WikiPassageQA.git`.
@@ -23,11 +28,69 @@ Setup the dev environment by running:
 
 ## Data Extraction Pipeline
 
-Currently, splits each row with multiple comma separated passage ids in `RelevantPassages` column into multiple rows, each with 1 passage id.
+1. Passage Data Extraction
+   - Convert to lower case
+   - Remove punctuation
+   - Tokenize
+   - Remove stop words
+   - Lemmatize/Stem
 
-**How to Run:** Execute `src/data_extraction/data_extraction.py` to extract data for train, test and dev datasets and store in `data/raw/extracted_query_data`. Use this data in further steps
+2. Query Data Extraction
+   - Convert to lower case
+   - Remove punctuation
+   - Tokenize
+   - Remove stop words
+   - Lemmatize/Stem
+   - Split each row with multiple comma separated passage ids in `RelevantPassages` column into multiple rows, each with 1 passage id.
 
-## Feature Extraction Pipeline (TBD)
+**How to Run:**
+
+1. Execute: `python src/data_extraction/query_data_extraction.py` to extract query data
+2. Execute: `python src/data_extraction/passage_data_extraction.py` to extract passage data
+
+Extracted data is stored in `data/extracted`. Query and Passage is converted to list of lemmatized/stemmed tokens.
+
+## Feature Extraction Pipeline
+
+1. Document Term Frequency
+2. Collection Term Frequency
+
+**How to Run:**
+Execute `python src/feature_extraction/feature_extraction.py (train|test|dev)` to extract train, test or validation features
+
+Extracted features are stored in `data/processed/train`, `data/processed/dev` and `data/processed/test`.
+
+Structure of Collection Term Frequency `col_term_freq.json`:
+
+```json
+{
+    "term1": 23,
+    "term2": 31,
+    ...
+}
+```
+
+where each key is a unique term in the collection of documents and its value is the number of its occurances in the collection across all documents.
+
+---
+
+Structure of Document Term Frequency `doc_term_freq.json`:
+
+```json
+{
+    "doc_id1": {
+        "term1": 23,
+        "term2": 31,
+        ...
+    },
+    "doc_id2": {
+        ...
+    },
+    ...
+}
+```
+
+where each key is a unique id for a document in the collection and key is a dictionary of terms in the documents as keys and their frequency in that document as values.
 
 ## Model Creation Pipeline (TBD)
 
@@ -52,3 +115,19 @@ src                    : all clean python scripts
 
 documents              : contains papers/reports required
 ```
+
+## Obtaining Metrics
+Edit the `/src/TestBench.py` to add function to either:
+1. generate test results
+2. read test results from a pickle
+Then use the tester in the __main__ function to run tests for the particular model.
+
+Keep  in ming that the output mapping is:
+QID -> (DocID + PassageID)
+
+Therefore, keep your outputs in a data frame with columns as
+```
+columns = ["QID", "DocID", "PassageID"]
+test_result = pd.DataFrame(columns=columns)
+```
+then you can populate test_result

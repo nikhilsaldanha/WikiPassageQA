@@ -12,11 +12,6 @@ class PassageFeatureExtraction:
         self.doc_term_freq = None
         self.col_term_freq = None
 
-    def load_query_data(self):
-        # load tsv file
-        df = pd.read_csv(self.query_data_path, delimiter="\t")
-        return df
-
     def load_passage_data(self):
         with open(self.passage_data_path) as f:
             data = json.load(f)
@@ -44,13 +39,15 @@ class PassageFeatureExtraction:
                 else:
                     doc_freq = term_frequency
                 self.doc_term_freq[doc_id][pass_id] = term_frequency
+            if doc_freq is None:
+                continue
             if self.col_term_freq is not None:
                 self.col_term_freq = self.col_term_freq + doc_freq
             else:
                 self.col_term_freq = doc_freq
 
-        tf_path = os.path.join(extract_path, "doc_term_freq.json")
-        coll_tf_path = os.path.join(extract_path, "col_term_freq.json")
+        tf_path = os.path.join(extract_path, "doc_term_freq_webap.json")
+        coll_tf_path = os.path.join(extract_path, "col_term_freq_webap.json")
 
         with open(tf_path, "w") as f:
             json.dump(self.doc_term_freq, f)
@@ -66,7 +63,7 @@ if __name__ == "__main__":
     DATA_DIR = os.path.join(CUR_DIR, "../../data")
     EXTRACT_DATA_DIR = os.path.join(DATA_DIR, "extracted")
 
-    passage_data_path = os.path.join(EXTRACT_DATA_DIR, "document_passages.json")
+    passage_data_path = os.path.join(EXTRACT_DATA_DIR, "webap_passages.json")
     fe = PassageFeatureExtraction(passage_data_path)
 
     extract_path = os.path.join(DATA_DIR, f"processed")

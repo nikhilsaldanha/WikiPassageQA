@@ -2,6 +2,7 @@ import json
 import pandas as pd
 import numpy as np
 import threading
+import os
 
 
 def thread_function(i, till_len):
@@ -19,7 +20,7 @@ def thread_function(i, till_len):
         count = count + 1
         print ("Thread " + str(i) +" docs completed: " + str(count))
     
-    passages_df.to_csv(PROCESSED_DATA_DIR+'/passage_df_'+str(i)+'_.csv', index=False)
+    passages_df.to_csv(PROCESSED_DATA_DIR+'/passage_df_WikiQA_'+str(i)+'_.csv', index=False)
 
 if __name__ == "__main__":
     import os
@@ -58,11 +59,12 @@ if __name__ == "__main__":
 
         # join the data frames
         for i in range(17):
-            df = pd.read_csv(PROCESSED_DATA_DIR+'/passage_df_'+str(i)+'_.csv')
+            df = pd.read_csv(PROCESSED_DATA_DIR+'/passage_df_WikiQA_'+str(i)+'_.csv')
             print(df.shape)
             passages_df = passages_df.append(df)
+            os.remove(PROCESSED_DATA_DIR+'/passage_df_WikiQA_'+str(i)+'_.csv')
 
         print(passages_df.shape)
-        passages_df.to_csv(PROCESSED_DATA_DIR+'/passage_df.csv', index=False)
+        passages_df.to_csv(PROCESSED_DATA_DIR+'/passage_df_WikiQA.csv', index=False)
 
 

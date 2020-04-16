@@ -3,23 +3,19 @@ import os
 import numpy as np
 
 
-class TestMetrics:
+class TestMetrics_WebAP:
 
     def __init__(self, testpath):
-        test = pd.read_csv(testpath, sep='\t')
-        test = test.rename(columns={"RelevantPassages":"PassageID"})
+        if testpath.endswith("tsv"):
+            test = pd.read_csv(testpath, sep='\t')
+        else:
+            test = pd.read_csv(testpath)
+        test = test.rename(columns={"RelevantPassages":"PassageID", "DocumentID": "DocID"})
         #   QID                                           Question  DocumentID DocumentName PassageID
         #0  449  What is Iraq's role in political unstabilization?         543    Iraq.html     42,43
-        
-        split_passageIds = test["PassageID"].str.split(",")
 
-        columns = ["QID", "DocID", "PassageID"]
-        test_true = pd.DataFrame(columns=columns)
-
-        for i in range(split_passageIds.size):
-            for j in range(len(split_passageIds.iloc[i])):
-                df2 = pd.DataFrame([[ test.iloc[i,0], test.iloc[i,2], split_passageIds.iloc[i][j] ]], columns=columns)
-                test_true = test_true.append(df2)
+        test_true = test
+        print(test_true)
 
         # convert char Passage Ids to int
         test_true["PassageID"] = test_true["PassageID"].astype(int)
@@ -50,7 +46,6 @@ class TestMetrics:
     def precision_recall(self, new_results, max_records):
         # group by QID
         qids = self.test["QID"].unique()
-
         prec = [] 
         recall = []
         # count total entries in true
@@ -66,7 +61,6 @@ class TestMetrics:
 
             prec.append(TP/ len(pred["key"].values))
             recall.append(TP/ len(true["key"].values))
-
 
         return np.mean(prec), np.mean(recall)
         # Compare presence of entries in new_entries
@@ -88,10 +82,10 @@ class TestMetrics:
             for rank in range(1,len(presence) +1 ):
                 # rank starting with 0
                 if presence[rank-1] == True:
-                    APs.append(len(APs)+1/rank)
+                    APs.append((len(APs)+1)/rank)
             if len(APs) > 0:
                 overall_APs.append(np.sum(APs) / len(APs))
-
+        
         MAP = np.sum(overall_APs) / len(qids)
         return MAP
 

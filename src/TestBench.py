@@ -22,7 +22,6 @@ def vsm(max_results):
     test = pd.read_csv(testpath, sep='\t')
 
     model = tf_idf_VSM(PROCESSED_DATA_DIR+'/passage_df.csv')
-
     columns = ["QID", "DocID", "PassageID", "cosine_sim"]
     test_result = pd.DataFrame(columns=columns)
 
@@ -37,6 +36,7 @@ def vsm(max_results):
         print("vsm: " + str(i) +"/"+str(length))
 
     test_result.to_csv(test_results_file, index=False)
+
     return test_result
 
 if __name__ == "__main__":

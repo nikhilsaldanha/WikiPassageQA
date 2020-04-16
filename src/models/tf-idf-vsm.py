@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     model = tf_idf_VSM(PROCESSED_DATA_DIR+'/passage_df.csv')
 
-    results = model.get_ranked_passages("Apple Microsoft Google Ireland tax")
+    results = model.get_ranked_passages("Apple Microsoft Google Ireland tax", max_results=1000)
     print(results)
 
     passages = results['Passage']

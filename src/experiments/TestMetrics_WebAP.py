@@ -59,7 +59,7 @@ class TestMetrics_WebAP:
             TP = presence.sum()
             FN = (~presence).sum()
 
-            prec.append(TP/ len(pred["key"].values))
+            prec.append(TP/ len(pred["key"].head(max_records).values))
             recall.append(TP/ len(true["key"].values))
 
         return np.mean(prec), np.mean(recall)

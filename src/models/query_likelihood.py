@@ -22,12 +22,12 @@ class QueryLikelihood:
         self.smoothing = smoothing
 
         if mu is None:
-            self.mu = 0.1
+            self.mu = 80
         else:
             self.mu = mu
 
         if lamda is None:
-            self.lamda = 0.1
+            self.lamda = 0.2
         else:
             self.lamda = lamda
 
@@ -86,19 +86,39 @@ class QueryLikelihood:
 
     def compute_score(self, query, doc_id, pass_id):
         score = 0
-        for term in query:
-            collection_freq = self.col_term_freq.get(term, 0)
-            if collection_freq == 0:
-                score = 0
-                return score
-            else:
-                score += math.log(
-                    self.overlap_tf[term][doc_id][pass_id]
-                    + self.mu * collection_freq / self.col_size
-                ) / (self.doc_size[doc_id][pass_id] + self.mu)
+
+        if self.smoothing == "Dirichlet":
+            for term in query:
+                collection_freq = self.col_term_freq.get(term, 0)
+                if collection_freq == 0:
+                    ref_freq = 0.00015461249573675236
+                    score += math.log(
+                        self.overlap_tf[term][doc_id][pass_id]
+                        + self.mu * (ref_freq / self.col_size)
+                    ) / (self.doc_size[doc_id][pass_id] + self.mu)
+                else:
+                    score += math.log(
+                        self.overlap_tf[term][doc_id][pass_id]
+                        + self.mu * (collection_freq / self.col_size)
+                    ) / (self.doc_size[doc_id][pass_id] + self.mu)
+        elif self.smoothing == "JM":
+            for term in query:
+                collection_freq = self.col_term_freq.get(term, 0)
+                term_freq = self.overlap_tf[term][doc_id][pass_id]
+                if term_freq > 0:
+                    score += math.log(
+                        (
+                            (
+                                (1 - self.lamda)
+                                * (term_freq / self.doc_size[doc_id][pass_id])
+                            )
+                            / (self.lamda * (collection_freq / self.col_size))
+                        )
+                        + 1
+                    )
         return score
 
-    def predict(self):
+    def predict(self, max_results=-1):
         """
         [
             [
@@ -109,8 +129,8 @@ class QueryLikelihood:
         ]
         """
         self.score = []
-        n = len(queries)
-        for i, query in enumerate(queries):
+        n = len(self.queries)
+        for i, query in enumerate(self.queries):
             gc.collect()
             # initialize list
             if i % 50 == 0:
@@ -120,11 +140,19 @@ class QueryLikelihood:
                 for pass_id in self.passage_data[doc_id]:
                     self.score[-1].append(
                         {
-                            "doc_id": doc_id,
-                            "pass_id": pass_id,
+                            "DocID": doc_id,
+                            "PassageID": pass_id,
                             "score": self.compute_score(query, doc_id, pass_id),
                         }
                     )
+            if max_results == -1:
+                self.score[-1] = sorted(
+                    self.score[-1], key=lambda x: x["score"], reverse=True
+                )
+            else:
+                self.score[-1] = sorted(
+                    self.score[-1], key=lambda x: x["score"], reverse=True
+                )[:max_results]
 
         return self.score
 
@@ -142,19 +170,17 @@ if __name__ == "__main__":
     query_path = os.path.join(EXTRACT_DATA_DIR, f"dev.csv")
     query_df = pd.read_csv(query_path)
 
-    feature_extract_path = os.path.join(PROCESSED_DATA_DIR, "dev")
-    fe.extract_features(feature_extract_path)
-    doc_term_freq = fe.doc_term_freq
-    col_term_freq = fe.col_term_freq
+    # fe.extract_features(PROCESSED_DATA_DIR)
+    # doc_term_freq = fe.doc_term_freq
+    # col_term_freq = fe.col_term_freq
     doc_term_freq = json.load(
-        open(os.path.join(feature_extract_path, "doc_term_freq.json"), "r")
+        open(os.path.join(PROCESSED_DATA_DIR, "doc_term_freq_webap.json"), "r")
     )
     col_term_freq = json.load(
-        open(os.path.join(feature_extract_path, "col_term_freq.json"), "r")
+        open(os.path.join(PROCESSED_DATA_DIR, "col_term_freq_webap.json"), "r")
     )
     ql = QueryLikelihood(passage_data, doc_term_freq, col_term_freq)
-    queries = [ast.literal_eval(el) for el in query_df["Question"].tolist()]
+    queries = [ast.literal_eval(el) for el in query_df[["QID", "Question"]].tolist()]
 
     ql.fit(queries)
     score = ql.predict()
-

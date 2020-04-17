@@ -113,7 +113,7 @@ if __name__ == "__main__":
     test_csv_path = './data/extracted/webap_queries.csv'
     passages_path = PROCESSED_DATA_DIR+'/passage_df_WebAP.csv'
     tester = TestMetrics_WebAP(test_csv_path)
-    max_results = 500
+    max_results = 1000
 
     vsm_results = vsm_WebAP("WebAP", test_csv_path, passages_path, max_results)
     tester.get_metrics(vsm_results, max_results)
